@@ -4,7 +4,7 @@ import os
 
 # Update your paths
 INPUT_FOLDER = r"C:\Users\ASUS\Desktop\NIT INTERNSHIP\50 Data"
-OUTPUT_FILE = r"C:\Users\ASUS\Desktop\NIT INTERNSHIP\capture_2256hm.txt"
+OUTPUT_FILE = r"C:\Users\ASUS\Desktop\NIT INTERNSHIP\capture_2000ohm.txt"
 
 # Serial Port Configuration
 ARDUINO_PORT = "COM5"  # Use COM5 as detected
