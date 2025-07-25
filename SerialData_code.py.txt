@@ -1,0 +1,58 @@
+import serial
+import time
+import os
+
+# Update your paths
+INPUT_FOLDER = r"C:\Users\ASUS\Desktop\NIT INTERNSHIP\50 Data"
+OUTPUT_FILE = r"C:\Users\ASUS\Desktop\NIT INTERNSHIP\capture_2256hm.txt"
+
+# Serial Port Configuration
+ARDUINO_PORT = "COM5"  # Use COM5 as detected
+BAUD_RATE = 9600
+NUM_FILES = 200  # Number of input files
+BIT_DELAY = 0.025  # 25ms delay between bits
+FILE_DELAY = 3  # 3 seconds delay between files
+
+# Initialize Serial Connection
+ser = serial.Serial(ARDUINO_PORT, BAUD_RATE, timeout=1)
+time.sleep(2)  # Allow Arduino to reset
+ser.flushInput()  # Clear input buffer
+
+all_received_data = []  # List to store all received responses
+
+# Loop through 200 files
+for i in range(1, NUM_FILES + 1):
+    input_filename = os.path.join(INPUT_FOLDER, f"fileinput{i}.txt")
+
+    # Read input data from file
+    try:
+        with open(input_filename, "r") as infile:
+            data = infile.read().strip()  # Remove extra spaces/newlines
+    except FileNotFoundError:
+        print(f"File {input_filename} not found. Skipping.")
+        continue
+
+    print(f"Sending data from {input_filename}...")
+
+    # Send data bit by bit
+    for bit in data:
+        ser.write(bit.encode())  # Send bit to Arduino
+        time.sleep(BIT_DELAY)  # 25ms delay between bits
+        
+        # Read response from Arduino
+        response = ser.readline().decode(errors='ignore').strip()  # FIXED: Ignore decoding errors
+        if response:
+            all_received_data.append(response)  # Store received data
+
+    print(f"Waiting {FILE_DELAY} seconds before sending next file...")
+    time.sleep(FILE_DELAY)  # 3 seconds delay before next file
+
+# Save all captured data to a single file
+with open(OUTPUT_FILE, "w") as outfile:
+    outfile.write("\n".join(all_received_data))
+
+print(f"Captured data saved in {OUTPUT_FILE}")
+
+# Close Serial Connection
+ser.close()
+print("Data transmission complete.")
